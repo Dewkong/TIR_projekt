@@ -31,10 +31,10 @@ def on_message(mqttc, obj, msg):
             print("json with incorrect format, " + str(e))
     elif msg.topic == "agh/iot/project9/active_sector":
         if int(msg.payload) == sector_id:
-            mqttc.publish("agh/iot/project9/sprinkler/" + str(id) + "/state", "1", 0, False)
+            mqttc.publish("agh/iot/project9/sprinkler/" + str(id) + "/state", "1", 2, False)
             time_to_sleep = (11 - (current_humidity/10)) if current_humidity != -1 else 5
             time.sleep(time_to_sleep)
-            mqttc.publish("agh/iot/project9/sprinkler/" + str(id) + "/state", "0", 0, False)
+            mqttc.publish("agh/iot/project9/sprinkler/" + str(id) + "/state", "0", 2, False)
     elif msg.topic == "agh/iot/project9/sensor/" + str(sensor_id) + "/humidity":
         current_humidity = int(msg.payload)
 
