@@ -23,7 +23,7 @@ def on_message(mqttc, obj, msg):
             msg_dict = json.loads(msg.payload)
             for sector in msg_dict["sectors"]:
                 for sprinkler in sector["sprinklers"]:
-                    if sprinkler["sprinkler_id"] == id:
+                    if sprinkler == id:
                         sector_id = int(sector["id"])
                         sensor_id = int(sector["sensor_id"])
                         mqttc.subscribe("agh/iot/project9/sensor/" + str(sensor_id) + "/humidity", 0)
