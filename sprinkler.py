@@ -8,6 +8,7 @@ mqttc_server = sys.argv[1]
 id = int(sys.argv[2])
 time_to_water = int(sys.argv[3])
 sector_id = None
+mid_to_water = None
 
 mqttc = mosquitto.Mosquitto()
 
@@ -15,7 +16,7 @@ def on_connect(mqttc, obj, rc):
     print("rc: "+ str(rc))
 
 def on_message(mqttc, obj, msg):
-    global sector_id
+    global sector_id, mid_to_water
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     if msg.topic == "agh/iot/project9/config":
         try:
@@ -34,19 +35,29 @@ def on_message(mqttc, obj, msg):
                 "sprinkler_id": id,
                 "is_watering": True
             }
-            mqttc.publish("agh/iot/project9/simulation/area/" + str(sector_id) + "/rain", json.dumps(before_watering), 2, False)
-            time.sleep(time_to_water)
-            after_watering = {
-                "rain": None,
-                "sprinkler_id": id,
-                "is_watering": False
-            }
-            mqttc.publish("agh/iot/project9/simulation/area/" + str(sector_id) + "/rain", json.dumps(after_watering), 2, False)
-            mqttc.publish("agh/iot/project9/sprinkler/" + str(id) + "/state", "0", 2, False)
+            mid_to_water = mqttc.publish("agh/iot/project9/simulation/area/" + str(sector_id) + "/rain", json.dumps(before_watering), 2, False)[1]
+            # time.sleep(time_to_water)
+            # after_watering = {
+            #     "rain": None,
+            #     "sprinkler_id": id,
+            #     "is_watering": False
+            # }
+            # mqttc.publish("agh/iot/project9/simulation/area/" + str(sector_id) + "/rain", json.dumps(after_watering), 2, False)
+            # mqttc.publish("agh/iot/project9/sprinkler/" + str(id) + "/state", "0", 2, False)
 
 
 def on_publish(mqttc, obj, mid):
+    global mid_to_water
     print("mid: " + str(mid))
+    if mid == mid_to_water:
+        time.sleep(time_to_water)
+        after_watering = {
+            "rain": None,
+            "sprinkler_id": id,
+            "is_watering": False
+        }
+        mqttc.publish("agh/iot/project9/simulation/area/" + str(sector_id) + "/rain", json.dumps(after_watering), 2, False)
+        mqttc.publish("agh/iot/project9/sprinkler/" + str(id) + "/state", "0", 2, False)
 
 def on_subscribe(mqttc, obj, mid, granted_qos):
     print("Subscribed: " + str(mid) + " " + str(granted_qos))
