@@ -30,14 +30,16 @@ def on_message(mqttc, obj, msg):
         if int(msg.payload) == sector_id:
             mqttc.publish("agh/iot/project9/sprinkler/" + str(id) + "/state", "1", 2, False)
             before_watering = {
-                "is_watering": True,
-                "sprinkler_id": id
+                "rain": None,
+                "sprinkler_id": id,
+                "is_watering": True
             }
             mqttc.publish("agh/iot/project9/simulation/area/" + str(sector_id) + "/rain", json.dumps(before_watering), 2, False)
             time.sleep(time_to_water)
             after_watering = {
-                "is_watering": False,
-                "sprinkler_id": id
+                "rain": None,
+                "sprinkler_id": id,
+                "is_watering": False
             }
             mqttc.publish("agh/iot/project9/simulation/area/" + str(sector_id) + "/rain", json.dumps(after_watering), 2, False)
             mqttc.publish("agh/iot/project9/sprinkler/" + str(id) + "/state", "0", 2, False)
